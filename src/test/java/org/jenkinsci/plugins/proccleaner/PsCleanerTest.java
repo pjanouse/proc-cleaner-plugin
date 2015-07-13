@@ -119,7 +119,9 @@ public class PsCleanerTest {
 
     @Test public void doNotCleanOnSlaveWithOtherBuildRunning() throws Exception {
         FreeStyleProject running = j.createFreeStyleProject();
-        running.getBuildersList().add(new Shell("sleep 300"));
+
+        final Proc[] p = new Proc[1];
+        running.getBuildersList().add(addLongRunningStep(p));
         running.scheduleBuild2(0);
 
         FreeStyleProject cleaned = j.createFreeStyleProject();
@@ -129,6 +131,11 @@ public class PsCleanerTest {
 
         verify(preCleaner, never()).clean(any(ProcCleaner.CleanRequest.class));
         verify(postCleaner, never()).clean(any(ProcCleaner.CleanRequest.class));
+
+        if(p[0].isAlive()) {
+            p[0].kill();
+            assertFalse("Long running process is still alive!", p[0].isAlive());
+        }
     }
 
     @Test public void runCleanupOnNonconcurrentJobs() throws Exception {
@@ -166,31 +173,7 @@ public class PsCleanerTest {
         FreeStyleProject job = j.createFreeStyleProject();
 
         final Proc[] p = new Proc[1];
-        job.getBuildersList().add(new TestBuilder() {
-            public boolean perform(AbstractBuild<?, ?> build,
-                                   Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-                ArgumentListBuilder args = new ArgumentListBuilder(
-                        JavaEnvUtils.getJreExecutable("java"),
-                        "-cp",
-                        "target/test-classes/",
-                        "org.jenkinsci.plugins.proccleaner.Sleeper",
-                        "Hello"
-                );
-                if (Functions.isWindows()) {
-                    args = args.toWindowsCommand();
-                }
-
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                final StreamTaskListener stlistener = new StreamTaskListener(out);
-                p[0] = new Launcher.LocalLauncher(stlistener)
-                        .launch()
-                        .stderr(System.err)
-                        .stdout(out)
-                        .cmds(args)
-                        .start();
-                return true;
-            }
-        });
+        job.getBuildersList().add(addLongRunningStep(p));
 
         // Configure plugin
         PsCleanerDescriptor descriptor = j.jenkins.getDescriptorByType(PsCleaner.PsCleanerDescriptor.class);
@@ -239,4 +222,31 @@ public class PsCleanerTest {
         Util.setPostProcCleaner(project, postCleaner);
     }
 
+    private TestBuilder addLongRunningStep(final Proc p[]) {
+        return new TestBuilder() {
+            public boolean perform(AbstractBuild<?, ?> build,
+                                   Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+                ArgumentListBuilder args = new ArgumentListBuilder(
+                        JavaEnvUtils.getJreExecutable("java"),
+                        "-cp",
+                        "target/test-classes/",
+                        "org.jenkinsci.plugins.proccleaner.Sleeper",
+                        "Hello"
+                );
+                if (Functions.isWindows()) {
+                    args = args.toWindowsCommand();
+                }
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                final StreamTaskListener stlistener = new StreamTaskListener(out);
+                p[0] = new Launcher.LocalLauncher(stlistener)
+                        .launch()
+                        .stderr(System.err)
+                        .stdout(out)
+                        .cmds(args)
+                        .start();
+                return true;
+            }
+        };
+    }
 }
