@@ -29,7 +29,7 @@ import hudson.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
@@ -53,7 +53,7 @@ public class PsBasedHPUXProcessTree extends PsBasedProcessTree {
             LOGGER.warning("'ps' command invocation IOException occurred!");
         }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+        BufferedReader reader = new BufferedReader(new StringReader(writer.toString()));
         if (proc.waitFor() != 0) {
             LOGGER.warning("'ps' command invocation " + ArrayUtils.toString(cmd) + " failed! Return code: "
                     + proc.exitValue());
