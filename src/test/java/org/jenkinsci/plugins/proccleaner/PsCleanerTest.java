@@ -210,7 +210,7 @@ public class PsCleanerTest {
         }
 
         assertTrue("Killing of long running process wasn't performed by Process cleanup, plug-in doesn't have an effect on the target platform!",
-                getLogAsString(build).matches("(?s).*Killing Process PID = .*, PPID = .*, ARGS = .*java.* -cp target/test-classes/.*"));
+                getLogAsString(build).matches("(?s).*Killing Process PID = .*, PPID = .*, ARGS = .*java.* -Xms00008m.*"));
     }
 
     private static final class BlockingCleaner extends PsCleaner {
@@ -249,6 +249,7 @@ public class PsCleanerTest {
                                    Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
                 ArgumentListBuilder args = new ArgumentListBuilder(
                         JavaEnvUtils.getJreExecutable("java"),
+                        "-Xms00008m",
                         "-cp",
                         "target/test-classes/",
                         "org.jenkinsci.plugins.proccleaner.Sleeper",
