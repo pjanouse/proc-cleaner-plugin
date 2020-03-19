@@ -32,7 +32,6 @@ import hudson.model.Descriptor;
 import hudson.tasks.BuildWrapper;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -69,6 +68,7 @@ public class PreBuildCleanup extends BuildWrapper {
     }
 
     @Extension
+    @SuppressWarnings("deprecation")
     public static final class DescriptorImpl extends Descriptor<BuildWrapper> {
 
         @Override
@@ -77,11 +77,15 @@ public class PreBuildCleanup extends BuildWrapper {
         }
 
         public static Collection<Descriptor<ProcCleaner>> getCleanerDescriptors(ProcCleaner current) {
-            DescriptorExtensionList<ProcCleaner, Descriptor<ProcCleaner>> all = Jenkins.getInstance().<ProcCleaner, Descriptor<ProcCleaner>>getDescriptorList(ProcCleaner.class);
+            Jenkins j = Jenkins.getInstance();
+            assert j != null;
 
+            DescriptorExtensionList<ProcCleaner, Descriptor<ProcCleaner>> all = j.<ProcCleaner, Descriptor<ProcCleaner>>getDescriptorList(ProcCleaner.class);
+            assert all != null;
 
             boolean preservingGroovyScript = current instanceof GroovyScriptCleaner;
             List<Descriptor<ProcCleaner>> out = new ArrayList<Descriptor<ProcCleaner>>();
+
             for (Descriptor<ProcCleaner> descriptor : all) {
                 if (descriptor instanceof GroovyScriptCleaner.GroovyScriptCleanerDescriptor && !preservingGroovyScript) {
                     // Groovy descriptor needs to be registered for xstream/data-binding to work. So we do not offer it

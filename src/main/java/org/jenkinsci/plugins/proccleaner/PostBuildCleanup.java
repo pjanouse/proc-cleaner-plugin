@@ -23,7 +23,6 @@
  */
 package org.jenkinsci.plugins.proccleaner;
 
-import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.BuildListener;
@@ -37,7 +36,6 @@ import hudson.tasks.Publisher;
 import java.io.IOException;
 import java.util.Collection;
 
-import jenkins.model.Jenkins;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 public class PostBuildCleanup extends Notifier {

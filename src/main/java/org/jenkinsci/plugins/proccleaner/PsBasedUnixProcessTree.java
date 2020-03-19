@@ -23,8 +23,6 @@
  */
 package org.jenkinsci.plugins.proccleaner;
 
-import hudson.util.IOUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -33,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -161,7 +160,7 @@ public class PsBasedUnixProcessTree extends PsBasedProcessTree {
                         while ((linePid = readerTree.readLine()) != null) {
                             if (getLog() != null)
                                 getLog().println("DEBUG: 'Filtered out: " + linePid + "'");
-                            PsProcess p = ptree.getByPid(new Integer(linePid));
+                            PsProcess p = ptree.getByPid(Integer.parseInt(linePid));
                             if (p != null) {
                                 toRemoveProcesses.add(p);
                             }

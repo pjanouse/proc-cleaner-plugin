@@ -23,7 +23,6 @@
  */
 package org.jenkinsci.plugins.proccleaner;
 
-import hudson.DescriptorExtensionList;
 import hudson.ExtensionList;
 import hudson.ExtensionPoint;
 import hudson.Launcher;
@@ -151,11 +150,17 @@ public abstract class ProcCleaner implements Describable<ProcCleaner>, Extension
     }
 
     public ProcCleanerDescriptor getDescriptor() {
-        return (ProcCleanerDescriptor) Jenkins.getInstance().getDescriptor(getClass());
+        Jenkins j = Jenkins.getInstance();
+        assert j != null;
+
+        return (ProcCleanerDescriptor) j.getDescriptor(getClass());
     }
 
     public static ExtensionList<ProcCleaner> all() {
-        return Jenkins.getInstance().getExtensionList(ProcCleaner.class);
+        Jenkins j = Jenkins.getInstance();
+        assert j != null;
+
+        return j.getExtensionList(ProcCleaner.class);
     }
 
     public static class ProcCleanerDescriptor extends Descriptor<ProcCleaner> {

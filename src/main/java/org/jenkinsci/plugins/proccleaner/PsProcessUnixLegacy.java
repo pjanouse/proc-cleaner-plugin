@@ -38,7 +38,7 @@ public class PsProcessUnixLegacy extends PsProcess{
     @Override
     public void kill(int signum) {
         try {
-            String[] cmd = {"kill", "-" + signum, ((Integer) getPid()).toString()};
+            String[] cmd = {"kill", "-" + signum, Integer.toString(getPid())};
             ProcessBuilder pb = new ProcessBuilder(cmd);
             pb.redirectErrorStream(true);
             Process proc = pb.start();

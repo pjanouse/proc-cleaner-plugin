@@ -23,9 +23,9 @@
  */
 package org.jenkinsci.plugins.proccleaner;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import hudson.util.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -69,7 +69,10 @@ public abstract class PsKiller implements ExtensionPoint, Serializable {
     public abstract String getDisplayName();
 
     public static ExtensionList<PsKiller> all() {
-        return Jenkins.getInstance().getExtensionList(PsKiller.class);
+        Jenkins j = Jenkins.getInstance();
+        assert j != null;
+
+        return j.getExtensionList(PsKiller.class);
     }
 
     private static final long serialVersionUID = 1L;

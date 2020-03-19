@@ -110,7 +110,10 @@ public class PsCleaner extends ProcCleaner {
 
     @Override
     public PsCleanerDescriptor getDescriptor() {
-        return (PsCleanerDescriptor) Jenkins.getInstance().getDescriptor(getClass());
+        Jenkins j = Jenkins.getInstance();
+        assert j != null;
+
+        return (PsCleanerDescriptor) j.getDescriptor(getClass());
     }
 
     @Extension

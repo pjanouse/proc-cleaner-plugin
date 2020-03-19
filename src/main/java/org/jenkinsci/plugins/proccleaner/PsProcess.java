@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public abstract class PsProcess {
@@ -91,7 +92,7 @@ public abstract class PsProcess {
     public void killAllExceptMe() {
         Map<Integer, PsProcess> ph = getParentHierarchy(this);
         for(PsProcess p : ptree.getProcessList())
-            if(this != p && !ph.containsKey(new Integer(p.pid))) // don't kill myself (and parent) //TODO should contain whole possible hierarchy
+            if(this != p && !ph.containsKey(p.pid)) // don't kill myself (and parent) //TODO should contain whole possible hierarchy
                 p.kill();
     }
 
@@ -99,7 +100,7 @@ public abstract class PsProcess {
         Map<Integer, PsProcess> ph = new HashMap<Integer, PsProcess>();
         while((p = p.getParent()) != null) {
             //p = p.getParent();
-            ph.put(new Integer(p.pid), p);
+            ph.put(p.pid, p);
         }
         return ph;
     }
@@ -116,8 +117,11 @@ public abstract class PsProcess {
                 return true;
         return false;
     }
-    
-    //TODO implement hashCode etc.
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pid, ppid, args, ptree);
+    }
 
     // private static final long serialVersionUID = 1L;
     

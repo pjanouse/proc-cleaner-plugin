@@ -55,11 +55,11 @@ public class WMICProcess {
         try {
             process = Runtime.getRuntime().exec(cmd);
             process.getOutputStream().close();
-            BufferedReader stdin = new BufferedReader((new InputStreamReader(process.getInputStream())));
+            BufferedReader stdin = new BufferedReader((new InputStreamReader(process.getInputStream(), "UTF-8")));
             String s = stdin.readLine(); //skip first line - it's parentprocessid label
             while((s = stdin.readLine()) != null){
                 if(!s.isEmpty()){
-                    ppid = Integer.valueOf(s.trim());
+                    ppid = Integer.parseInt(s.trim());
                 }
             }
             stdin.close();
@@ -80,7 +80,7 @@ public class WMICProcess {
         try {
             process = Runtime.getRuntime().exec(cmd);
             process.getOutputStream().close();
-            BufferedReader stdin = new BufferedReader((new InputStreamReader(process.getInputStream())));
+            BufferedReader stdin = new BufferedReader((new InputStreamReader(process.getInputStream(), "UTF-8")));
             String s = stdin.readLine(); //skip first line - it's caption and commandline label
             while((s = stdin.readLine()) != null){
                  args.append(s);
@@ -107,34 +107,37 @@ public class WMICProcess {
 
             // Get input stream
             process.getOutputStream().close();
-            BufferedReader stdin = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-            // Read and parse command standard output
-            String s;
-            while ((s = stdin.readLine()) != null) {
-                //search for pid line
-                Matcher mpid = PID_PATTERN.matcher(s);
-                if(mpid.matches()){
-                    int pid = Integer.valueOf(mpid.group(2));
-                    while((s = stdin.readLine()) != null){
-                        //search for ReturnValue line
-                        if(!s.isEmpty()){
-                            Matcher mret = RETVAL_PATTERN.matcher(s);
-                            if(mret.matches()){
-                                int retval = Integer.valueOf(mret.group(2));
-                                if(retval == 0){
-                                    //call getowner successfull completion
-                                    while((s = stdin.readLine()) != null){
-                                        //search for user line
-                                        Matcher muser = USER_PATTERN.matcher(s);
-                                        if(muser.matches() && user.equals(muser.group(2))){
-                                            //success, add PID to the list
-                                            uplist.add(pid);
+            try (BufferedReader stdin = new BufferedReader(
+                    new InputStreamReader(process.getInputStream(), "UTF-8"))) {
+
+                // Read and parse command standard output
+                String s;
+                while ((s = stdin.readLine()) != null) {
+                    //search for pid line
+                    Matcher mpid = PID_PATTERN.matcher(s);
+                    if (mpid.matches()) {
+                        int pid = Integer.parseInt(mpid.group(2));
+                        while ((s = stdin.readLine()) != null) {
+                            //search for ReturnValue line
+                            if (!s.isEmpty()) {
+                                Matcher mret = RETVAL_PATTERN.matcher(s);
+                                if (mret.matches()) {
+                                    int retval = Integer.parseInt(mret.group(2));
+                                    if (retval == 0) {
+                                        //call getowner successfull completion
+                                        while ((s = stdin.readLine()) != null) {
+                                            //search for user line
+                                            Matcher muser = USER_PATTERN.matcher(s);
+                                            if (muser.matches() && user.equals(muser.group(2))) {
+                                                //success, add PID to the list
+                                                uplist.add(pid);
+                                            }
+                                            break;
                                         }
-                                        break;
                                     }
+                                    break;
                                 }
-                                break;
                             }
                         }
                     }
@@ -159,7 +162,7 @@ public class WMICProcess {
         return pid;
     }
 
-    public class WMICProcessException extends Exception {
+    public static class WMICProcessException extends Exception {
         
         private static final long serialVersionUID = 4810696271189726206L;
 

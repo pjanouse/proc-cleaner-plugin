@@ -92,7 +92,7 @@ public abstract class PsBasedProcessTree {
     }
 
     private int s2i(String str) {
-        return new Integer(str.trim()).intValue();
+        return Integer.parseInt(str.trim());
     }
 
     @Override

@@ -42,6 +42,7 @@ public class GroovyScriptCleanerTest {
     @Rule public JenkinsRule j = new JenkinsRule();
 
     @Test @Issue("SECURITY-489") @LocalData
+    @SuppressWarnings("deprecation")
     public void killGroovySupport() throws Exception {
         final String EXPECTED_MESSAGE = Messages.GroovyScriptCleaner_DisplayName();
 
