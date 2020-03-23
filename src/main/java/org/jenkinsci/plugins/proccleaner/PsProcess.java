@@ -120,7 +120,7 @@ public abstract class PsProcess {
 
     @Override
     public int hashCode() {
-        return Objects.hash(pid, ppid, args, ptree);
+        return Objects.hash(pid);
     }
 
     // private static final long serialVersionUID = 1L;
